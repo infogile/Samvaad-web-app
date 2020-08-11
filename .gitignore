@@ -1,0 +1,6 @@
+matrix-js-sdk/dist/
+matrix-js-sdk/node_modules/
+matrix-js-sdk/lib/
+matrix-react-sdk/lib/
+matrix-react-sdk/node_modules/
+samvaad-web-client/node_modules/
