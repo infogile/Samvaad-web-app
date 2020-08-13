@@ -1,6 +1,6 @@
 {
-    "default_server_name": "matrix.org",
-    "brand": "Riot",
+    "default_server_name": "m.samvaad.im",
+    "brand": "Samvaad",
     "integrations_ui_url": "https://scalar-staging.vector.im/",
     "integrations_rest_url": "https://scalar-staging.vector.im/api",
     "integrations_widgets_urls": [
