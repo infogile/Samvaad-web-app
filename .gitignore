@@ -5,4 +5,4 @@ matrix-react-sdk/lib/
 matrix-react-sdk/node_modules/
 samvaad-web-client/node_modules/
 samvaad-web-client/webapp/
-git-hooks
+git-hooks/
