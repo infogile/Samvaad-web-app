@@ -18,6 +18,7 @@ limitations under the License.
 /** The types of page which can be shown by the LoggedInView */
 export default {
     HomePage: "home_page",
+    ProfilePage: "profile_page",
     RoomView: "room_view",
     RoomDirectory: "room_directory",
     UserView: "user_view",

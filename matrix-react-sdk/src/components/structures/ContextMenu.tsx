@@ -16,12 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, {CSSProperties, useRef, useState} from "react";
+import React, { CSSProperties, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 
-import {Key} from "../../Keyboard";
-import {Writeable} from "../../@types/common";
+import { Key } from "../../Keyboard";
+import { Writeable } from "../../@types/common";
 
 // Shamelessly ripped off Modal.js.  There's probably a better way
 // of doing reusable widgets like dialog boxes & menus where we go and
@@ -275,6 +275,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
         if (props.left) {
             position.left = props.left;
             chevronFace = ChevronFace.Left;
+            console.log("test", props)
         } else {
             position.right = props.right;
             chevronFace = ChevronFace.Right;
@@ -367,7 +368,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
         return (
             <div
                 className="mx_ContextualMenu_wrapper"
-                style={{...position, ...wrapperStyle}}
+                style={{ ...position, ...wrapperStyle }}
                 onKeyDown={this.onKeyDown}
                 onContextMenu={this.onContextMenuPreventBubbling}
             >
@@ -377,10 +378,10 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
                     ref={this.collectContextMenuRect}
                     role={this.props.managed ? "menu" : undefined}
                 >
-                    { chevron }
-                    { props.children }
+                    {chevron}
+                    {props.children}
                 </div>
-                { background }
+                {background}
             </div>
         );
     }
@@ -392,10 +393,10 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
 
 // Placement method for <ContextMenu /> to position context menu to right of elementRect with chevronOffset
 export const toRightOf = (elementRect: DOMRect, chevronOffset = 12) => {
-    const left = elementRect.right + window.pageXOffset + 3;
+    const left = elementRect.right + window.pageXOffset + 100;
     let top = elementRect.top + (elementRect.height / 2) + window.pageYOffset;
     top -= chevronOffset + 8; // where 8 is half the height of the chevron
-    return {left, top, chevronOffset};
+    return { left, top, chevronOffset };
 };
 
 // Placement method for <ContextMenu /> to position context menu right-aligned and flowing to the left of elementRect
@@ -438,7 +439,7 @@ export default class LegacyContextMenu extends ContextMenu {
 
 // XXX: Deprecated, used only for dynamic Tooltips. Avoid using at all costs.
 export function createMenu(ElementClass, props) {
-    const onFinished = function(...args) {
+    const onFinished = function (...args) {
         ReactDOM.unmountComponentAtNode(getOrCreateContainer());
 
         if (props && props.onFinished) {
@@ -456,15 +457,15 @@ export function createMenu(ElementClass, props) {
 
     ReactDOM.render(menu, getOrCreateContainer());
 
-    return {close: onFinished};
+    return { close: onFinished };
 }
 
 // re-export the semantic helper components for simplicity
-export {ContextMenuButton} from "../../accessibility/context_menu/ContextMenuButton";
-export {ContextMenuTooltipButton} from "../../accessibility/context_menu/ContextMenuTooltipButton";
-export {MenuGroup} from "../../accessibility/context_menu/MenuGroup";
-export {MenuItem} from "../../accessibility/context_menu/MenuItem";
-export {MenuItemCheckbox} from "../../accessibility/context_menu/MenuItemCheckbox";
-export {MenuItemRadio} from "../../accessibility/context_menu/MenuItemRadio";
-export {StyledMenuItemCheckbox} from "../../accessibility/context_menu/StyledMenuItemCheckbox";
-export {StyledMenuItemRadio} from "../../accessibility/context_menu/StyledMenuItemRadio";
+export { ContextMenuButton } from "../../accessibility/context_menu/ContextMenuButton";
+export { ContextMenuTooltipButton } from "../../accessibility/context_menu/ContextMenuTooltipButton";
+export { MenuGroup } from "../../accessibility/context_menu/MenuGroup";
+export { MenuItem } from "../../accessibility/context_menu/MenuItem";
+export { MenuItemCheckbox } from "../../accessibility/context_menu/MenuItemCheckbox";
+export { MenuItemRadio } from "../../accessibility/context_menu/MenuItemRadio";
+export { StyledMenuItemCheckbox } from "../../accessibility/context_menu/StyledMenuItemCheckbox";
+export { StyledMenuItemRadio } from "../../accessibility/context_menu/StyledMenuItemRadio";
