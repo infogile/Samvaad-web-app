@@ -1,5 +1,5 @@
 config for DEVOPS
-
-1. chmode +x ./runme.sh
-2. Enter answers
-3. cheers!!
+1. clone 
+2. chmode +x ./runme.sh
+3. Enter answers
+4. cheers!!
