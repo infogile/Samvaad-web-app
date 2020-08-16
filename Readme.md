@@ -19,3 +19,4 @@ config for developers
 12. yarn link matrix-react-sdk
 13. yarn install
 14. yarn start
+jhftf
