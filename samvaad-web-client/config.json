@@ -1,7 +1,7 @@
 {
     "default_server_config": {
         "m.homeserver": {
-            "base_url": "https://m.samvaad.im/",
+            "base_url": "http://localhost:8008",
             "server_name": "Samvaad"
         },
         "m.identity_server": {

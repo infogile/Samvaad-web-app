@@ -22,8 +22,6 @@ limitations under the License.
  */
 
 let components = {};
-import structures$TagPanel from './components/structures/TagPanel';
-structures$TagPanel && (components['structures.TagPanel'] = structures$TagPanel);
 import structures$VectorEmbeddedPage from './components/structures/VectorEmbeddedPage';
 structures$VectorEmbeddedPage && (components['structures.VectorEmbeddedPage'] = structures$VectorEmbeddedPage);
 import structures$auth$ForgotPassword from './components/structures/auth/ForgotPassword';
