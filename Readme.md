@@ -6,7 +6,7 @@ config for DEVOPS
 
 config for developers
 1. pushd matrix-js-sdk
-2.yarn link
+2. yarn link
 3. yarn install
 4. popd
 5. pushd matrix-react-sdk
