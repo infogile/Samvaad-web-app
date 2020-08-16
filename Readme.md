@@ -20,4 +20,4 @@ config for developers
 13. yarn install
 14. yarn start
 
-#Some comments
+# Some new comments
