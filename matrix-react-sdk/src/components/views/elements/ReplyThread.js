@@ -15,18 +15,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import React from 'react';
-import * as sdk from '../../../index';
-import {_t} from '../../../languageHandler';
-import PropTypes from 'prop-types';
-import dis from '../../../dispatcher/dispatcher';
-import {wantsDateSeparator} from '../../../DateUtils';
-import {MatrixEvent} from 'matrix-js-sdk';
-import {makeUserPermalink, RoomPermalinkCreator} from "../../../utils/permalinks/Permalinks";
+import React from "react";
+import * as sdk from "../../../index";
+import { _t } from "../../../languageHandler";
+import PropTypes from "prop-types";
+import dis from "../../../dispatcher/dispatcher";
+import { wantsDateSeparator } from "../../../DateUtils";
+import { MatrixEvent } from "matrix-js-sdk";
+import {
+    makeUserPermalink,
+    RoomPermalinkCreator,
+} from "../../../utils/permalinks/Permalinks";
 import SettingsStore from "../../../settings/SettingsStore";
 import escapeHtml from "escape-html";
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
-import {Action} from "../../../dispatcher/actions";
+import { Action } from "../../../dispatcher/actions";
 import sanitizeHtml from "sanitize-html";
 
 // This component does no cycle detection, simply because the only way to make such a cycle would be to
@@ -74,21 +77,22 @@ export default class ReplyThread extends React.Component {
         // could be used here for replies as well... However, the helper
         // currently assumes the relation has a `rel_type`, which older replies
         // do not, so this block is left as-is for now.
-        const mRelatesTo = ev.getWireContent()['m.relates_to'];
-        if (mRelatesTo && mRelatesTo['m.in_reply_to']) {
-            const mInReplyTo = mRelatesTo['m.in_reply_to'];
-            if (mInReplyTo && mInReplyTo['event_id']) return mInReplyTo['event_id'];
+        const mRelatesTo = ev.getWireContent()["m.relates_to"];
+        if (mRelatesTo && mRelatesTo["m.in_reply_to"]) {
+            const mInReplyTo = mRelatesTo["m.in_reply_to"];
+            if (mInReplyTo && mInReplyTo["event_id"])
+                return mInReplyTo["event_id"];
         }
     }
 
     // Part of Replies fallback support
     static stripPlainReply(body) {
         // Removes lines beginning with `> ` until you reach one that doesn't.
-        const lines = body.split('\n');
-        while (lines.length && lines[0].startsWith('> ')) lines.shift();
+        const lines = body.split("\n");
+        while (lines.length && lines[0].startsWith("> ")) lines.shift();
         // Reply fallback has a blank line after it, so remove it to prevent leading newline
-        if (lines[0] === '') lines.shift();
-        return lines.join('\n');
+        if (lines[0] === "") lines.shift();
+        return lines.join("\n");
     }
 
     // Part of Replies fallback support
@@ -100,21 +104,18 @@ export default class ReplyThread extends React.Component {
         // anyways.  However, we sanitize to 1) remove any mx-reply, so that we
         // don't generate a nested mx-reply, and 2) make sure that the HTML is
         // properly formatted (e.g. tags are closed where necessary)
-        return sanitizeHtml(
-            html,
-            {
-                allowedTags: false, // false means allow everything
-                allowedAttributes: false,
-                exclusiveFilter: (frame) => frame.tag === "mx-reply",
-            },
-        );
+        return sanitizeHtml(html, {
+            allowedTags: false, // false means allow everything
+            allowedAttributes: false,
+            exclusiveFilter: (frame) => frame.tag === "mx-reply",
+        });
     }
 
     // Part of Replies fallback support
     static getNestedReplyText(ev, permalinkCreator) {
         if (!ev) return null;
 
-        let {body, formatted_body: html} = ev.getContent();
+        let { body, formatted_body: html } = ev.getContent();
         if (this.getParentEventId(ev)) {
             if (body) body = this.stripPlainReply(body);
         }
@@ -128,7 +129,7 @@ export default class ReplyThread extends React.Component {
             // Escape the body to use as HTML below.
             // We also run a nl2br over the result to fix the fallback representation. We do this
             // after converting the text to safe HTML to avoid user-provided BR's from being converted.
-            html = escapeHtml(body).replace(/\n/g, '<br/>');
+            html = escapeHtml(body).replace(/\n/g, "<br/>");
         }
 
         // dev note: do not rely on `body` being safe for HTML usage below.
@@ -139,44 +140,50 @@ export default class ReplyThread extends React.Component {
 
         // This fallback contains text that is explicitly EN.
         switch (ev.getContent().msgtype) {
-            case 'm.text':
-            case 'm.notice': {
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>`
-                    + `<br>${html}</blockquote></mx-reply>`;
-                const lines = body.trim().split('\n');
+            case "m.text":
+            case "m.notice": {
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>` +
+                    `<br>${html}</blockquote></mx-reply>`;
+                const lines = body.trim().split("\n");
                 if (lines.length > 0) {
                     lines[0] = `<${mxid}> ${lines[0]}`;
-                    body = lines.map((line) => `> ${line}`).join('\n') + '\n\n';
+                    body = lines.map((line) => `> ${line}`).join("\n") + "\n\n";
                 }
                 break;
             }
-            case 'm.image':
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>`
-                    + `<br>sent an image.</blockquote></mx-reply>`;
+            case "m.image":
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>` +
+                    `<br>sent an image.</blockquote></mx-reply>`;
                 body = `> <${mxid}> sent an image.\n\n`;
                 break;
-            case 'm.video':
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>`
-                    + `<br>sent a video.</blockquote></mx-reply>`;
+            case "m.video":
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>` +
+                    `<br>sent a video.</blockquote></mx-reply>`;
                 body = `> <${mxid}> sent a video.\n\n`;
                 break;
-            case 'm.audio':
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>`
-                    + `<br>sent an audio file.</blockquote></mx-reply>`;
+            case "m.audio":
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>` +
+                    `<br>sent an audio file.</blockquote></mx-reply>`;
                 body = `> <${mxid}> sent an audio file.\n\n`;
                 break;
-            case 'm.file':
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>`
-                    + `<br>sent a file.</blockquote></mx-reply>`;
+            case "m.file":
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> <a href="${userLink}">${mxid}</a>` +
+                    `<br>sent a file.</blockquote></mx-reply>`;
                 body = `> <${mxid}> sent a file.\n\n`;
                 break;
-            case 'm.emote': {
-                html = `<mx-reply><blockquote><a href="${evLink}">In reply to</a> * `
-                    + `<a href="${userLink}">${mxid}</a><br>${html}</blockquote></mx-reply>`;
-                const lines = body.trim().split('\n');
+            case "m.emote": {
+                html =
+                    `<mx-reply><blockquote><a href="${evLink}">In reply to</a> * ` +
+                    `<a href="${userLink}">${mxid}</a><br>${html}</blockquote></mx-reply>`;
+                const lines = body.trim().split("\n");
                 if (lines.length > 0) {
                     lines[0] = `* <${mxid}> ${lines[0]}`;
-                    body = lines.map((line) => `> ${line}`).join('\n') + '\n\n';
+                    body = lines.map((line) => `> ${line}`).join("\n") + "\n\n";
                 }
                 break;
             }
@@ -184,31 +191,39 @@ export default class ReplyThread extends React.Component {
                 return null;
         }
 
-        return {body, html};
+        return { body, html };
     }
 
     static makeReplyMixIn(ev) {
         if (!ev) return {};
         return {
-            'm.relates_to': {
-                'm.in_reply_to': {
-                    'event_id': ev.getId(),
+            "m.relates_to": {
+                "m.in_reply_to": {
+                    event_id: ev.getId(),
                 },
             },
         };
     }
 
-    static makeThread(parentEv, onHeightChanged, permalinkCreator, ref, useIRCLayout) {
+    static makeThread(
+        parentEv,
+        onHeightChanged,
+        permalinkCreator,
+        ref,
+        useIRCLayout
+    ) {
         if (!ReplyThread.getParentEventId(parentEv)) {
             return <div className="mx_ReplyThread_wrapper_empty" />;
         }
-        return <ReplyThread
-            parentEv={parentEv}
-            onHeightChanged={onHeightChanged}
-            ref={ref}
-            permalinkCreator={permalinkCreator}
-            useIRCLayout={useIRCLayout}
-        />;
+        return (
+            <ReplyThread
+                parentEv={parentEv}
+                onHeightChanged={onHeightChanged}
+                ref={ref}
+                permalinkCreator={permalinkCreator}
+                useIRCLayout={useIRCLayout}
+            />
+        );
     }
 
     componentDidMount() {
@@ -228,7 +243,10 @@ export default class ReplyThread extends React.Component {
         this.unmounted = true;
         if (this.room) {
             this.room.removeListener("Room.redaction", this.onRoomRedaction);
-            this.room.removeListener("Room.redactionCancelled", this.onRoomRedaction);
+            this.room.removeListener(
+                "Room.redactionCancelled",
+                this.onRoomRedaction
+            );
         }
     }
 
@@ -236,23 +254,26 @@ export default class ReplyThread extends React.Component {
         if (this.unmounted) return;
 
         // If one of the events we are rendering gets redacted, force a re-render
-        if (this.state.events.some(event => event.getId() === ev.getId())) {
+        if (this.state.events.some((event) => event.getId() === ev.getId())) {
             this.forceUpdate();
         }
     };
 
     async initialize() {
-        const {parentEv} = this.props;
+        const { parentEv } = this.props;
         // at time of making this component we checked that props.parentEv has a parentEventId
         const ev = await this.getEvent(ReplyThread.getParentEventId(parentEv));
         if (this.unmounted) return;
 
         if (ev) {
-            this.setState({
-                events: [ev],
-            }, this.loadNextEvent);
+            this.setState(
+                {
+                    events: [ev],
+                },
+                this.loadNextEvent
+            );
         } else {
-            this.setState({err: true});
+            this.setState({ err: true });
         }
     }
 
@@ -272,9 +293,9 @@ export default class ReplyThread extends React.Component {
         if (this.unmounted) return;
 
         if (loadedEv) {
-            this.setState({loadedEv});
+            this.setState({ loadedEv });
         } else {
-            this.setState({err: true});
+            this.setState({ err: true });
         }
     }
 
@@ -285,7 +306,10 @@ export default class ReplyThread extends React.Component {
         try {
             // ask the client to fetch the event we want using the context API, only interface to do so is to ask
             // for a timeline with that event, but once it is loaded we can use findEventById to look up the ev map
-            await this.context.getEventTimeline(this.room.getUnfilteredTimelineSet(), eventId);
+            await this.context.getEventTimeline(
+                this.room.getUnfilteredTimelineSet(),
+                eventId
+            );
         } catch (e) {
             // if it fails catch the error and return early, there's no point trying to find the event in this case.
             // Return null as it is falsey and thus should be treated as an error (as the event cannot be resolved).
@@ -305,10 +329,13 @@ export default class ReplyThread extends React.Component {
     onQuoteClick() {
         const events = [this.state.loadedEv, ...this.state.events];
 
-        this.setState({
-            loadedEv: null,
-            events,
-        }, this.loadNextEvent);
+        this.setState(
+            {
+                loadedEv: null,
+                events,
+            },
+            this.loadNextEvent
+        );
 
         dis.fire(Action.FocusComposer);
     }
@@ -317,56 +344,87 @@ export default class ReplyThread extends React.Component {
         let header = null;
 
         if (this.state.err) {
-            header = <blockquote className="mx_ReplyThread mx_ReplyThread_error">
-                {
-                    _t('Unable to load event that was replied to, ' +
-                        'it either does not exist or you do not have permission to view it.')
-                }
-            </blockquote>;
+            header = (
+                <blockquote className="mx_ReplyThread mx_ReplyThread_error">
+                    {_t(
+                        "Unable to load event that was replied to, " +
+                            "it either does not exist or you do not have permission to view it."
+                    )}
+                </blockquote>
+            );
         } else if (this.state.loadedEv) {
             const ev = this.state.loadedEv;
-            const Pill = sdk.getComponent('elements.Pill');
+            const Pill = sdk.getComponent("elements.Pill");
             const room = this.context.getRoom(ev.getRoomId());
-            header = <blockquote className="mx_ReplyThread">
-                {
-                    _t('<a>In reply to</a> <pill>', {}, {
-                        'a': (sub) => <a onClick={this.onQuoteClick} className="mx_ReplyThread_show">{ sub }</a>,
-                        'pill': <Pill type={Pill.TYPE_USER_MENTION} room={room}
-                                      url={makeUserPermalink(ev.getSender())} shouldShowPillAvatar={true} />,
-                    })
-                }
-            </blockquote>;
+            header = (
+                <blockquote className="mx_ReplyThread">
+                    {_t(
+                        "<a>In reply to</a> <pill>",
+                        {},
+                        {
+                            a: (sub) => (
+                                <a
+                                    onClick={this.onQuoteClick}
+                                    className="mx_ReplyThread_show"
+                                >
+                                    {sub}
+                                </a>
+                            ),
+                            pill: (
+                                <Pill
+                                    type={Pill.TYPE_USER_MENTION}
+                                    room={room}
+                                    url={makeUserPermalink(ev.getSender())}
+                                    shouldShowPillAvatar={true}
+                                />
+                            ),
+                        }
+                    )}
+                </blockquote>
+            );
         } else if (this.state.loading) {
             const Spinner = sdk.getComponent("elements.Spinner");
             header = <Spinner w={16} h={16} />;
         }
 
-        const EventTile = sdk.getComponent('views.rooms.EventTile');
-        const DateSeparator = sdk.getComponent('messages.DateSeparator');
+        const EventTile = sdk.getComponent("views.rooms.EventTile");
+        const DateSeparator = sdk.getComponent("messages.DateSeparator");
         const evTiles = this.state.events.map((ev) => {
             let dateSep = null;
 
-            if (wantsDateSeparator(this.props.parentEv.getDate(), ev.getDate())) {
-                dateSep = <a href={this.props.url}><DateSeparator ts={ev.getTs()} /></a>;
+            if (
+                wantsDateSeparator(this.props.parentEv.getDate(), ev.getDate())
+            ) {
+                dateSep = (
+                    <a href={this.props.url}>
+                        <DateSeparator ts={ev.getTs()} />
+                    </a>
+                );
             }
 
-            return <blockquote className="mx_ReplyThread" key={ev.getId()}>
-                { dateSep }
-                <EventTile
-                    mxEvent={ev}
-                    tileShape="reply"
-                    onHeightChanged={this.props.onHeightChanged}
-                    permalinkCreator={this.props.permalinkCreator}
-                    isRedacted={ev.isRedacted()}
-                    isTwelveHour={SettingsStore.getValue("showTwelveHourTimestamps")}
-                    useIRCLayout={this.props.useIRCLayout}
-                />
-            </blockquote>;
+            return (
+                <blockquote className="mx_ReplyThread" key={ev.getId()}>
+                    {dateSep}
+                    <EventTile
+                        mxEvent={ev}
+                        tileShape="reply"
+                        onHeightChanged={this.props.onHeightChanged}
+                        permalinkCreator={this.props.permalinkCreator}
+                        isRedacted={ev.isRedacted()}
+                        isTwelveHour={SettingsStore.getValue(
+                            "showTwelveHourTimestamps"
+                        )}
+                        useIRCLayout={this.props.useIRCLayout}
+                    />
+                </blockquote>
+            );
         });
 
-        return <div className="mx_ReplyThread_wrapper">
-            <div>{ header }</div>
-            <div>{ evTiles }</div>
-        </div>;
+        return (
+            <div className="mx_ReplyThread_wrapper">
+                <div>{header}</div>
+                <div>{evTiles}</div>
+            </div>
+        );
     }
 }

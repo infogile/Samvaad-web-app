@@ -30,7 +30,9 @@ import { Writeable } from "../../@types/common";
 const ContextualMenuContainerId = "mx_ContextualMenu_Container";
 
 function getOrCreateContainer(): HTMLDivElement {
-    let container = document.getElementById(ContextualMenuContainerId) as HTMLDivElement;
+    let container = document.getElementById(
+        ContextualMenuContainerId
+    ) as HTMLDivElement;
 
     if (!container) {
         container = document.createElement("div");
@@ -41,7 +43,11 @@ function getOrCreateContainer(): HTMLDivElement {
     return container;
 }
 
-const ARIA_MENU_ITEM_ROLES = new Set(["menuitem", "menuitemcheckbox", "menuitemradio"]);
+const ARIA_MENU_ITEM_ROLES = new Set([
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+]);
 
 interface IPosition {
     top?: number;
@@ -119,7 +125,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
 
         let first = element.querySelector('[role^="menuitem"]');
         if (!first) {
-            first = element.querySelector('[tab-index]');
+            first = element.querySelector("[tab-index]");
         }
         if (first) {
             first.focus();
@@ -142,11 +148,23 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
             // XXX: This isn't pretty but the only way to allow opening a different context menu on right click whilst
             // a context menu and its click-guard are up without completely rewriting how the context menus work.
             setImmediate(() => {
-                const clickEvent = document.createEvent('MouseEvents');
+                const clickEvent = document.createEvent("MouseEvents");
                 clickEvent.initMouseEvent(
-                    'contextmenu', true, true, window, 0,
-                    0, 0, x, y, false, false,
-                    false, false, 0, null,
+                    "contextmenu",
+                    true,
+                    true,
+                    window,
+                    0,
+                    0,
+                    0,
+                    x,
+                    y,
+                    false,
+                    false,
+                    false,
+                    false,
+                    0,
+                    null
                 );
                 document.elementFromPoint(x, y).dispatchEvent(clickEvent);
             });
@@ -170,8 +188,12 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
         let descending = false; // are we currently descending or ascending through the DOM tree?
 
         do {
-            const child = up ? element.lastElementChild : element.firstElementChild;
-            const sibling = up ? element.previousElementSibling : element.nextElementSibling;
+            const child = up
+                ? element.lastElementChild
+                : element.firstElementChild;
+            const sibling = up
+                ? element.previousElementSibling
+                : element.nextElementSibling;
 
             if (descending) {
                 if (child) {
@@ -192,12 +214,18 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
             }
 
             if (element) {
-                if (element.classList.contains("mx_ContextualMenu")) { // we hit the top
-                    element = up ? element.lastElementChild : element.firstElementChild;
+                if (element.classList.contains("mx_ContextualMenu")) {
+                    // we hit the top
+                    element = up
+                        ? element.lastElementChild
+                        : element.firstElementChild;
                     descending = true;
                 }
             }
-        } while (element && !ARIA_MENU_ITEM_ROLES.has(element.getAttribute("role")));
+        } while (
+            element &&
+            !ARIA_MENU_ITEM_ROLES.has(element.getAttribute("role"))
+        );
 
         if (element) {
             (element as HTMLElement).focus();
@@ -207,7 +235,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
     private onMoveFocusHomeEnd = (element: Element, up: boolean) => {
         let results = element.querySelectorAll('[role^="menuitem"]');
         if (!results) {
-            results = element.querySelectorAll('[tab-index]');
+            results = element.querySelectorAll("[tab-index]");
         }
         if (results && results.length) {
             if (up) {
@@ -275,13 +303,14 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
         if (props.left) {
             position.left = props.left;
             chevronFace = ChevronFace.Left;
-            console.log("test", props)
         } else {
             position.right = props.right;
             chevronFace = ChevronFace.Right;
         }
 
-        const contextMenuRect = this.state.contextMenuElem ? this.state.contextMenuElem.getBoundingClientRect() : null;
+        const contextMenuRect = this.state.contextMenuElem
+            ? this.state.contextMenuElem.getBoundingClientRect()
+            : null;
 
         const chevronOffset: CSSProperties = {};
         if (props.chevronFace) {
@@ -289,7 +318,10 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
         }
         const hasChevron = chevronFace && chevronFace !== ChevronFace.None;
 
-        if (chevronFace === ChevronFace.Top || chevronFace === ChevronFace.Bottom) {
+        if (
+            chevronFace === ChevronFace.Top ||
+            chevronFace === ChevronFace.Bottom
+        ) {
             chevronOffset.left = props.chevronOffset;
         } else if (position.top !== undefined) {
             const target = position.top;
@@ -301,28 +333,44 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
             // such that it does not leave the (padded) window.
             if (contextMenuRect) {
                 const padding = 10;
-                adjusted = Math.min(position.top, document.body.clientHeight - contextMenuRect.height + padding);
+                adjusted = Math.min(
+                    position.top,
+                    document.body.clientHeight -
+                        contextMenuRect.height +
+                        padding
+                );
             }
 
             position.top = adjusted;
-            chevronOffset.top = Math.max(props.chevronOffset, props.chevronOffset + target - adjusted);
+            chevronOffset.top = Math.max(
+                props.chevronOffset,
+                props.chevronOffset + target - adjusted
+            );
         }
 
         let chevron;
         if (hasChevron) {
-            chevron = <div style={chevronOffset} className={"mx_ContextualMenu_chevron_" + chevronFace} />;
+            chevron = (
+                <div
+                    style={chevronOffset}
+                    className={"mx_ContextualMenu_chevron_" + chevronFace}
+                />
+            );
         }
 
         const menuClasses = classNames({
-            'mx_ContextualMenu': true,
-            'mx_ContextualMenu_left': !hasChevron && position.left,
-            'mx_ContextualMenu_right': !hasChevron && position.right,
-            'mx_ContextualMenu_top': !hasChevron && position.top,
-            'mx_ContextualMenu_bottom': !hasChevron && position.bottom,
-            'mx_ContextualMenu_withChevron_left': chevronFace === ChevronFace.Left,
-            'mx_ContextualMenu_withChevron_right': chevronFace === ChevronFace.Right,
-            'mx_ContextualMenu_withChevron_top': chevronFace === ChevronFace.Top,
-            'mx_ContextualMenu_withChevron_bottom': chevronFace === ChevronFace.Bottom,
+            mx_ContextualMenu: true,
+            mx_ContextualMenu_left: !hasChevron && position.left,
+            mx_ContextualMenu_right: !hasChevron && position.right,
+            mx_ContextualMenu_top: !hasChevron && position.top,
+            mx_ContextualMenu_bottom: !hasChevron && position.bottom,
+            mx_ContextualMenu_withChevron_left:
+                chevronFace === ChevronFace.Left,
+            mx_ContextualMenu_withChevron_right:
+                chevronFace === ChevronFace.Right,
+            mx_ContextualMenu_withChevron_top: chevronFace === ChevronFace.Top,
+            mx_ContextualMenu_withChevron_bottom:
+                chevronFace === ChevronFace.Bottom,
         });
 
         const menuStyle: CSSProperties = {};
@@ -394,14 +442,19 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
 // Placement method for <ContextMenu /> to position context menu to right of elementRect with chevronOffset
 export const toRightOf = (elementRect: DOMRect, chevronOffset = 12) => {
     const left = elementRect.right + window.pageXOffset + 100;
-    let top = elementRect.top + (elementRect.height / 2) + window.pageYOffset;
+    let top = elementRect.top + elementRect.height / 2 + window.pageYOffset;
     top -= chevronOffset + 8; // where 8 is half the height of the chevron
     return { left, top, chevronOffset };
 };
 
 // Placement method for <ContextMenu /> to position context menu right-aligned and flowing to the left of elementRect
-export const aboveLeftOf = (elementRect: DOMRect, chevronFace = ChevronFace.None) => {
-    const menuOptions: IPosition & { chevronFace: ChevronFace } = { chevronFace };
+export const aboveLeftOf = (
+    elementRect: DOMRect,
+    chevronFace = ChevronFace.None
+) => {
+    const menuOptions: IPosition & { chevronFace: ChevronFace } = {
+        chevronFace,
+    };
 
     const buttonRight = elementRect.right + window.pageXOffset;
     const buttonBottom = elementRect.bottom + window.pageYOffset;
@@ -447,13 +500,15 @@ export function createMenu(ElementClass, props) {
         }
     };
 
-    const menu = <LegacyContextMenu
-        {...props}
-        onFinished={onFinished} // eslint-disable-line react/jsx-no-bind
-        windowResize={onFinished} // eslint-disable-line react/jsx-no-bind
-    >
-        <ElementClass {...props} onFinished={onFinished} />
-    </LegacyContextMenu>;
+    const menu = (
+        <LegacyContextMenu
+            {...props}
+            onFinished={onFinished} // eslint-disable-line react/jsx-no-bind
+            windowResize={onFinished} // eslint-disable-line react/jsx-no-bind
+        >
+            <ElementClass {...props} onFinished={onFinished} />
+        </LegacyContextMenu>
+    );
 
     ReactDOM.render(menu, getOrCreateContainer());
 

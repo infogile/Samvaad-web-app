@@ -1,27 +1,13 @@
-/*
-Copyright 2019 New Vector Ltd
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 import React, { createRef } from "react";
-import { _t } from "../../../languageHandler";
-import { MatrixClientPeg } from "../../../MatrixClientPeg";
-import Field from "../elements/Field";
+import { _t } from "../../languageHandler";
+import { MatrixClientPeg } from "../../MatrixClientPeg";
+import Field from "../views/elements/Field";
 import { User } from "matrix-js-sdk";
-import { getHostingLink } from "../../../utils/HostingLink";
-import * as sdk from "../../../index";
-
+import * as sdk from "../../index";
+import Navigation from "./BottomNavigation";
+import GeneralUserSettingsTab from "../views/settings/tabs/user/GeneralUserSettingsTab";
+import { getThreepidsWithBindStatus } from "../../../src/boundThreepids";
+import "./profile.css";
 export default class ProfileSettings extends React.Component {
     constructor() {
         super();
@@ -39,8 +25,9 @@ export default class ProfileSettings extends React.Component {
             user = new User(client.getUserId());
         }
         let avatarUrl = user.avatarUrl;
-        if (avatarUrl)
+        if (avatarUrl) {
             avatarUrl = client.mxcUrlToHttp(avatarUrl, 96, 96, "crop", false);
+        }
         this.state = {
             userId: user.userId,
             originalDisplayName: user.rawDisplayName,
@@ -49,9 +36,17 @@ export default class ProfileSettings extends React.Component {
             avatarUrl: avatarUrl,
             avatarFile: null,
             enableProfileSave: false,
+            emails: [],
+            loading3pids: true,
         };
 
         this._avatarUpload = createRef();
+    }
+
+    // TODO: [REACT-WARNING] Move this to constructor
+    async UNSAFE_componentWillMount() {
+        // eslint-disable-line camelcase
+        this._getThreepidState();
     }
 
     _uploadAvatar = () => {
@@ -71,7 +66,9 @@ export default class ProfileSettings extends React.Component {
     _saveProfile = async (e) => {
         e.stopPropagation();
         e.preventDefault();
-
+        console.log("Saving...2");
+        console.log(this.state);
+        console.log(this.state.enableProfileSave);
         if (!this.state.enableProfileSave) return;
         this.setState({ enableProfileSave: false });
 
@@ -84,7 +81,7 @@ export default class ProfileSettings extends React.Component {
             await client.setDisplayName(this.state.displayName);
             newState.originalDisplayName = this.state.displayName;
         }
-
+        console.log("saving 3");
         if (this.state.avatarFile) {
             const uri = await client.uploadContent(this.state.avatarFile);
             await client.setAvatarUrl(uri);
@@ -100,8 +97,10 @@ export default class ProfileSettings extends React.Component {
         } else if (this.state.originalAvatarUrl !== this.state.avatarUrl) {
             await client.setAvatarUrl(""); // use empty string as Synapse 500s on undefined
         }
+        console.log("saving 4");
 
         this.setState(newState);
+        console.log(newState);
     };
 
     _onDisplayNameChanged = (e) => {
@@ -129,55 +128,54 @@ export default class ProfileSettings extends React.Component {
                 avatarFile: file,
                 enableProfileSave: true,
             });
+            this._saveProfile(e);
         };
         reader.readAsDataURL(file);
     };
+    async _getThreepidState() {
+        const cli = MatrixClientPeg.get();
+        // Check to see if terms need accepting
+        // this._checkTerms();
+
+        // Need to get 3PIDs generally for Account section and possibly also for
+        // Discovery (assuming we have an IS and terms are agreed).
+        let threepids = [];
+        try {
+            threepids = await getThreepidsWithBindStatus(cli);
+        } catch (e) {
+            const idServerUrl = MatrixClientPeg.get().getIdentityServerUrl();
+            console.warn(
+                `Unable to reach identity server at ${idServerUrl} to check ` +
+                    `for 3PIDs bindings in Settings`
+            );
+            console.warn(e);
+        }
+        this.setState({
+            emails: threepids.filter((a) => a.medium === "email"),
+            loading3pids: false,
+        });
+    }
 
     render() {
-        const hostingSignupLink = getHostingLink("user-settings");
-        let hostingSignup = null;
-        if (hostingSignupLink) {
-            hostingSignup = (
-                <span className="mx_ProfileSettings_hostingSignup">
-                    {_t(
-                        "<a>Upgrade</a> to your own domain",
-                        {},
-                        {
-                            a: (sub) => (
-                                <a
-                                    href={hostingSignupLink}
-                                    target="_blank"
-                                    rel="noreferrer noopener"
-                                >
-                                    {sub}
-                                </a>
-                            ),
-                        }
-                    )}
-                    <a
-                        href={hostingSignupLink}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                    >
-                        <img
-                            src={require("../../../../res/img/external-link.svg")}
-                            width="11"
-                            height="10"
-                            alt=""
-                        />
-                    </a>
-                </span>
-            );
-        }
-
-        const AccessibleButton = sdk.getComponent("elements.AccessibleButton");
-        const AvatarSetting = sdk.getComponent("settings.AvatarSetting");
+        // const AccessibleButton = sdk.getComponent("elements.AccessibleButton");
+        // const AvatarSetting = sdk.getComponent("settings.AvatarSetting");
         return (
-            <form
+            <>
+                <GeneralUserSettingsTab
+                    closeSettingsFn={() => {
+                        console.log("closeSettingFn");
+                    }}
+                />
+                <Navigation
+                    page_type={this.props.page_type}
+                    dis={this.props.dis}
+                />
+
+                {/*
+<form
                 onSubmit={this._saveProfile}
                 autoComplete="off"
                 noValidate={true}
-                style={{ textAlign: "center", paddingTop: "20px" }}
             >
                 <input
                     type="file"
@@ -186,22 +184,9 @@ export default class ProfileSettings extends React.Component {
                     onChange={this._onAvatarChanged}
                     accept="image/*"
                 />
-                <div
-                    className="mx_ProfileSettings_profile"
-                    style={{
-                        flexDirection: "column-reverse",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <div
-                        className="mx_ProfileSettings_controls"
-                        style={{ marginTop: "100px", width: "80%" }}
-                    >
-                        {/* <p>
-                            {this.state.userId}
-                            {hostingSignup}
-                        </p> */}
+                <div className="mx_ProfileSettings_profile">
+                    <div className="mx_ProfileSettings_controls">
+                        <p>{this.state.userId}</p>
                         <Field
                             label={_t("Display Name")}
                             type="text"
@@ -210,27 +195,23 @@ export default class ProfileSettings extends React.Component {
                             onChange={this._onDisplayNameChanged}
                         />
                     </div>
-                    <div>
-                        <AvatarSetting
-                            avatarUrl={this.state.avatarUrl}
-                            avatarName={
-                                this.state.displayName || this.state.userId
-                            }
-                            avatarAltText={_t("Profile picture")}
-                            uploadAvatar={this._uploadAvatar}
-                            removeAvatar={this._removeAvatar}
-                        />
-                    </div>
+                    <AvatarSetting
+                        avatarUrl={this.state.avatarUrl}
+                        avatarName={this.state.displayName || this.state.userId}
+                        avatarAltText={_t("Profile picture")}
+                        uploadAvatar={this._uploadAvatar}
+                        removeAvatar={this._removeAvatar}
+                    />
                 </div>
                 <AccessibleButton
                     onClick={this._saveProfile}
                     kind="primary"
                     disabled={!this.state.enableProfileSave}
-                    style={{ width: "70%" }}
                 >
                     {_t("Save")}
                 </AccessibleButton>
-            </form>
+            </form> */}
+            </>
         );
     }
 }

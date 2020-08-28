@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-.mx_GeneralUserSettingsTab_changePassword .mx_Field {
-    @mixin mx_Settings_fullWidthField;
-}
+// .mx_GeneralUserSettingsTab_changePassword .mx_Field {
+//     @mixin mx_Settings_fullWidthField;
+// }
 
 .mx_GeneralUserSettingsTab_changePassword .mx_Field:first-child {
     margin-top: 0;
@@ -28,13 +28,13 @@ limitations under the License.
     justify-content: left;
 }
 
-.mx_GeneralUserSettingsTab_accountSection .mx_EmailAddresses,
-.mx_GeneralUserSettingsTab_accountSection .mx_PhoneNumbers,
-.mx_GeneralUserSettingsTab_discovery .mx_ExistingEmailAddress,
-.mx_GeneralUserSettingsTab_discovery .mx_ExistingPhoneNumber,
-.mx_GeneralUserSettingsTab_languageInput {
-    @mixin mx_Settings_fullWidthField;
-}
+// .mx_GeneralUserSettingsTab_accountSection .mx_EmailAddresses,
+// .mx_GeneralUserSettingsTab_accountSection .mx_PhoneNumbers,
+// .mx_GeneralUserSettingsTab_discovery .mx_ExistingEmailAddress,
+// .mx_GeneralUserSettingsTab_discovery .mx_ExistingPhoneNumber,
+// .mx_GeneralUserSettingsTab_languageInput {
+//     @mixin mx_Settings_fullWidthField;
+// }
 
 .mx_GeneralUserSettingsTab_warningIcon {
     vertical-align: middle;

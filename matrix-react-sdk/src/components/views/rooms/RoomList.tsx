@@ -325,7 +325,7 @@ export default class RoomList extends React.PureComponent<IProps, IState> {
                     onAddRoom={aesthetics.onAddRoom}
                     addRoomLabel={aesthetics.addRoomLabel ? _t(aesthetics.addRoomLabel) : aesthetics.addRoomLabel}
                     isMinimized={this.props.isMinimized}
-                    onResize={this.props.onResize}
+                    onResize={this.props.onResize} 
                     extraBadTilesThatShouldntExist={extraTiles}
                 />
             );
