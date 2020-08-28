@@ -10,9 +10,33 @@ const loaderUtils = require("loader-utils");
 // 3 strings translated is just frustrating)
 // This could readily be automated, but it's nice to explicitly
 // control when new languages are available.
-const INCLUDE_LANGS = [{'value': 'en_EN', 'label': 'English'},
+const INCLUDE_LANGS = [
+    {'value': 'bg', 'label': 'Български'},
+    {'value': 'ca', 'label': 'Català'},
+    {'value': 'cs', 'label': 'čeština'},
+    {'value': 'da', 'label': 'Dansk'},
+    {'value': 'de_DE', 'label': 'Deutsch'},
+    {'value': 'el', 'label': 'Ελληνικά'},
+    {'value': 'en_EN', 'label': 'English'},
     {'value': 'en_US', 'label': 'English (US)'},
+    {'value': 'eo', 'label': 'Esperanto'},
+    {'value': 'es', 'label': 'Español'},
+    {'value': 'eu', 'label': 'Euskara'},
+    {'value': 'fi', 'label': 'Suomi'},
+    {'value': 'fr', 'label': 'Français'},
+    {'value': 'gl', 'label': 'Galego'},
     {'value': 'hi', 'label': 'हिन्दी'},
+    {'value': 'hu', 'label': 'Magyar'},
+    {'value': 'is', 'label': 'íslenska'},
+    {'value': 'it', 'label': 'Italiano'},
+    {'value': 'nb_NO', 'label': 'Norwegian Bokmål'},
+    {'value': 'nl', 'label': 'Nederlands'},
+    {'value': 'nn', 'label': 'Norsk Nynorsk'},
+    {'value': 'pl', 'label': 'Polski'},
+    {'value': 'pt', 'label': 'Português'},
+    {'value': 'pt_BR', 'label': 'Português do Brasil'},
+    {'value': 'ru', 'label': 'Русский'},
+    {'value': 'sk', 'label': 'Slovenčina'},
 ];
 
 // cpx includes globbed parts of the filename in the destination, but excludes
